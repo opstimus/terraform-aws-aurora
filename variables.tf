@@ -129,6 +129,12 @@ variable "enable_cpu_alarm" {
   default     = false
 }
 
+variable "enable_rds_proxy" {
+  type = bool
+  description = "Enable RDS Proxy"
+  default = false
+}
+
 variable "debug_logging" {
   type    = bool
   default = false

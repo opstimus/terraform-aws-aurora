@@ -161,11 +161,13 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
 }
 
 resource "aws_secretsmanager_secret" "main_proxy" {
+  count = var.enable_rds_proxy ? 1 :0
   name = "${var.project}-${var.environment}-db-username-and-password"
 }
 
 resource "aws_secretsmanager_secret_version" "main_proxy" {
-  secret_id = aws_secretsmanager_secret.db.id
+  count = var.enable_rds_proxy ? 1 :0
+  secret_id = aws_secretsmanager_secret.main_proxy.id
   secret_string = jsondecode({
     username            = aws_rds_cluster.main.master_username
     password            = aws_rds_cluster.main.master_password
@@ -181,6 +183,7 @@ data "aws_kms_key" "main" {
 }
 
 resource "aws_iam_role" "main_proxy" {
+  count = var.enable_rds_proxy ? 1 :0
   name = "${var.project}-${var.environment}-proxy"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -197,6 +200,7 @@ resource "aws_iam_role" "main_proxy" {
 }
 
 resource "aws_iam_role_policy" "main_proxy" {
+  count = var.enable_rds_proxy ? 1 :0
   name = "${var.project}-${var.environment}-proxy"
   role = aws_iam_role.main_proxy.id
 
@@ -233,6 +237,7 @@ resource "aws_iam_role_policy" "main_proxy" {
 }
 
 resource "aws_db_proxy" "main" {
+  count = var.enable_rds_proxy ? 1 :0
   name                   = "${var.project}-${var.environment}-proxy"
   debug_logging          = var.debug_logging
   engine_family          = var.engine_family
@@ -251,6 +256,7 @@ resource "aws_db_proxy" "main" {
 }
 
 resource "aws_db_proxy_default_target_group" "main" {
+  count = var.enable_rds_proxy ? 1 :0
   db_proxy_name = aws_db_proxy.main.name
 
   connection_pool_config {
@@ -263,6 +269,7 @@ resource "aws_db_proxy_default_target_group" "main" {
 }
 
 resource "aws_db_proxy_target" "example" {
+  count = var.enable_rds_proxy ? 1 :0
   db_instance_identifier = aws_rds_cluster.main.cluster_identifier
   db_proxy_name          = aws_db_proxy.main.name
   target_group_name      = aws_db_proxy_default_target_group.main.name
