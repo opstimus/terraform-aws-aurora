@@ -159,3 +159,111 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
     DBInstanceIdentifier = aws_rds_cluster.main.id
   }
 }
+
+resource "aws_secretsmanager_secret" "main_proxy" {
+  name = "${var.project}-${var.environment}-db-username-and-password"
+}
+
+resource "aws_secretsmanager_secret_version" "main_proxy" {
+  secret_id = aws_secretsmanager_secret.db.id
+  secret_string = jsondecode({
+    username            = aws_rds_cluster.main.master_username
+    password            = aws_rds_cluster.main.master_password
+    engine              = var.engine_family
+    host                = aws_rds_cluster.main.host
+    port                = 3306
+    dbClusterIdentifier = aws_rds_cluster.main.cluster_identifier
+  })
+}
+
+data "aws_kms_key" "main" {
+  key_id = "aws/secretsmanager"
+}
+
+resource "aws_iam_role" "main_proxy" {
+  name = "${var.project}-${var.environment}-proxy"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "main_proxy" {
+  name = "${var.project}-${var.environment}-proxy"
+  role = aws_iam_role.main_proxy.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "GetSecretValue",
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Effect = "Allow"
+        Resource = [
+          aws_secretsmanager_secret.main_proxy.arn
+        ]
+      },
+      {
+        Sid = "DecryptSecretValue",
+        Action = [
+          "kms:Decrypt"
+        ],
+        Effect = "Allow"
+        Resource = [
+          data.aws_kms_key.kms_secret.arn
+        ],
+        Condition = {
+          "StringEquals" = {
+            "kms:ViaService" = "secretsmanager.ap-southeast-1.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_db_proxy" "main" {
+  name                   = "${var.project}-${var.environment}-proxy"
+  debug_logging          = var.debug_logging
+  engine_family          = var.engine_family
+  idle_client_timeout    = 1800
+  require_tls            = var.require_tls
+  role_arn               = aws_iam_role.main_proxy.arn
+  vpc_security_group_ids = [aws_security_group.db.id]
+  vpc_subnet_ids         = var.private_subnet_ids
+
+  auth {
+    auth_scheme = "SECRETS"
+    description = "Native Authentication"
+    iam_auth    = "DISABLED"
+    secret_arn  = aws_secretsmanager_secret.main_proxy.arn
+  }
+}
+
+resource "aws_db_proxy_default_target_group" "main" {
+  db_proxy_name = aws_db_proxy.main.name
+
+  connection_pool_config {
+    connection_borrow_timeout    = var.connection_borrow_timeout
+    init_query                   = var.init_query
+    max_connections_percent      = var.max_connections_percent
+    max_idle_connections_percent = var.max_idle_connections_percent
+    session_pinning_filters      = ["NONE"]
+  }
+}
+
+resource "aws_db_proxy_target" "example" {
+  db_instance_identifier = aws_rds_cluster.main.cluster_identifier
+  db_proxy_name          = aws_db_proxy.main.name
+  target_group_name      = aws_db_proxy_default_target_group.main.name
+}

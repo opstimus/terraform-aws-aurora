@@ -128,3 +128,43 @@ variable "enable_cpu_alarm" {
   description = "Enable CPU alarm"
   default     = false
 }
+
+variable "debug_logging" {
+  type    = bool
+  default = false
+}
+
+variable "engine_family" {
+  type        = string
+  description = "Engine Family i.e: MYSQL"
+}
+
+variable "require_tls" {
+  type    = bool
+  default = false
+}
+
+variable "port" {
+  type        = number
+  description = "SQL Port"
+}
+
+variable "connection_borrow_timeout" {
+  type    = number
+  default = 120
+}
+
+variable "init_query" {
+  type        = string
+  description = "SQL statements to set up the initial session state for each connection"
+}
+
+variable "max_connections_percent" {
+  type    = number
+  default = 80
+}
+
+variable "max_idle_connections_percent" {
+  type    = number
+  default = 50
+}
