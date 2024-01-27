@@ -182,7 +182,7 @@ data "aws_kms_key" "main" {
   key_id = "alias/aws/secretsmanager"
 }
 
-resource "aws_iam_role" "main_proxy" {
+resource "aws_iam_role" "main" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}-proxy"
   assume_role_policy = jsonencode({
@@ -199,10 +199,10 @@ resource "aws_iam_role" "main_proxy" {
   })
 }
 
-resource "aws_iam_role_policy" "main_proxy" {
+resource "aws_iam_role_policy" "main" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}-proxy"
-  role  = aws_iam_role.main_proxy[0].id
+  role  = aws_iam_role.main[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -243,7 +243,7 @@ resource "aws_db_proxy" "main" {
   engine_family          = var.engine_family
   idle_client_timeout    = 1800
   require_tls            = var.require_tls
-  role_arn               = aws_iam_role.main_proxy[0].arn
+  role_arn               = aws_iam_role.main[0].arn
   vpc_security_group_ids = [aws_security_group.db.id]
   vpc_subnet_ids         = var.private_subnet_ids
 
@@ -268,7 +268,7 @@ resource "aws_db_proxy_default_target_group" "main" {
   }
 }
 
-resource "aws_db_proxy_target" "example" {
+resource "aws_db_proxy_target" "main" {
   count                 = var.enable_rds_proxy ? 1 : 0
   db_cluster_identifier = aws_rds_cluster.main.cluster_identifier
   db_proxy_name         = aws_db_proxy.main[0].name
