@@ -161,12 +161,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
 }
 
 resource "aws_secretsmanager_secret" "main_proxy" {
-  count = var.enable_rds_proxy ? 1 :0
-  name = "${var.project}-${var.environment}-db-username-and-password"
+  count = var.enable_rds_proxy ? 1 : 0
+  name  = "${var.project}-${var.environment}-db-username-and-password"
 }
 
 resource "aws_secretsmanager_secret_version" "main_proxy" {
-  count = var.enable_rds_proxy ? 1 :0
+  count     = var.enable_rds_proxy ? 1 : 0
   secret_id = aws_secretsmanager_secret.main_proxy[0].id
   secret_string = jsonencode({
     username            = aws_rds_cluster.main.master_username
@@ -183,8 +183,8 @@ data "aws_kms_key" "main" {
 }
 
 resource "aws_iam_role" "main_proxy" {
-  count = var.enable_rds_proxy ? 1 :0
-  name = "${var.project}-${var.environment}-proxy"
+  count = var.enable_rds_proxy ? 1 : 0
+  name  = "${var.project}-${var.environment}-proxy"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -200,9 +200,9 @@ resource "aws_iam_role" "main_proxy" {
 }
 
 resource "aws_iam_role_policy" "main_proxy" {
-  count = var.enable_rds_proxy ? 1 :0
-  name = "${var.project}-${var.environment}-proxy"
-  role = aws_iam_role.main_proxy[0].id
+  count = var.enable_rds_proxy ? 1 : 0
+  name  = "${var.project}-${var.environment}-proxy"
+  role  = aws_iam_role.main_proxy[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -237,7 +237,7 @@ resource "aws_iam_role_policy" "main_proxy" {
 }
 
 resource "aws_db_proxy" "main" {
-  count = var.enable_rds_proxy ? 1 :0
+  count                  = var.enable_rds_proxy ? 1 : 0
   name                   = "${var.project}-${var.environment}-proxy"
   debug_logging          = var.debug_logging
   engine_family          = var.engine_family
@@ -256,7 +256,7 @@ resource "aws_db_proxy" "main" {
 }
 
 resource "aws_db_proxy_default_target_group" "main" {
-  count = var.enable_rds_proxy ? 1 :0
+  count         = var.enable_rds_proxy ? 1 : 0
   db_proxy_name = aws_db_proxy.main[0].name
 
   connection_pool_config {
@@ -264,12 +264,12 @@ resource "aws_db_proxy_default_target_group" "main" {
     init_query                   = var.init_query
     max_connections_percent      = var.max_connections_percent
     max_idle_connections_percent = var.max_idle_connections_percent
-    session_pinning_filters      = ["NONE"]
+    session_pinning_filters      = ["EXCLUDE_VARIABLE_SETS"]
   }
 }
 
 resource "aws_db_proxy_target" "example" {
-  count = var.enable_rds_proxy ? 1 :0
+  count                  = var.enable_rds_proxy ? 1 : 0
   db_instance_identifier = aws_rds_cluster.main.cluster_identifier
   db_proxy_name          = aws_db_proxy.main[0].name
   target_group_name      = aws_db_proxy_default_target_group.main[0].name
