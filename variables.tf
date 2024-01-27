@@ -143,6 +143,7 @@ variable "debug_logging" {
 variable "engine_family" {
   type        = string
   description = "Engine Family i.e: MYSQL"
+  default = ""
 }
 
 variable "require_tls" {
@@ -153,6 +154,7 @@ variable "require_tls" {
 variable "port" {
   type        = number
   description = "SQL Port"
+  default = 0
 }
 
 variable "connection_borrow_timeout" {
@@ -163,6 +165,7 @@ variable "connection_borrow_timeout" {
 variable "init_query" {
   type        = string
   description = "SQL statements to set up the initial session state for each connection"
+  default = ""
 }
 
 variable "max_connections_percent" {
