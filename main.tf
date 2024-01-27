@@ -168,7 +168,7 @@ resource "aws_secretsmanager_secret" "main_proxy" {
 resource "aws_secretsmanager_secret_version" "main_proxy" {
   count = var.enable_rds_proxy ? 1 :0
   secret_id = aws_secretsmanager_secret.main_proxy[0].id
-  secret_string = jsondecode({
+  secret_string = jsonencode({
     username            = aws_rds_cluster.main.master_username
     password            = aws_rds_cluster.main.master_password
     engine              = var.engine_family
