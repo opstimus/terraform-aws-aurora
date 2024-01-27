@@ -179,7 +179,7 @@ resource "aws_secretsmanager_secret_version" "main_proxy" {
 }
 
 data "aws_kms_key" "main" {
-  key_id = "aws/secretsmanager"
+  key_id = "alias/aws/secretsmanager"
 }
 
 resource "aws_iam_role" "main_proxy" {
@@ -202,7 +202,7 @@ resource "aws_iam_role" "main_proxy" {
 resource "aws_iam_role_policy" "main_proxy" {
   count = var.enable_rds_proxy ? 1 :0
   name = "${var.project}-${var.environment}-proxy"
-  role = aws_iam_role.main_proxy.id
+  role = aws_iam_role.main_proxy[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -214,7 +214,7 @@ resource "aws_iam_role_policy" "main_proxy" {
         ],
         Effect = "Allow"
         Resource = [
-          aws_secretsmanager_secret.main_proxy.arn
+          aws_secretsmanager_secret.main_proxy[0].arn
         ]
       },
       {
@@ -224,7 +224,7 @@ resource "aws_iam_role_policy" "main_proxy" {
         ],
         Effect = "Allow"
         Resource = [
-          data.aws_kms_key.kms_secret.arn
+          data.aws_kms_key.main.arn
         ],
         Condition = {
           "StringEquals" = {
@@ -243,7 +243,7 @@ resource "aws_db_proxy" "main" {
   engine_family          = var.engine_family
   idle_client_timeout    = 1800
   require_tls            = var.require_tls
-  role_arn               = aws_iam_role.main_proxy.arn
+  role_arn               = aws_iam_role.main_proxy[0].arn
   vpc_security_group_ids = [aws_security_group.db.id]
   vpc_subnet_ids         = var.private_subnet_ids
 
@@ -251,13 +251,13 @@ resource "aws_db_proxy" "main" {
     auth_scheme = "SECRETS"
     description = "Native Authentication"
     iam_auth    = "DISABLED"
-    secret_arn  = aws_secretsmanager_secret.main_proxy.arn
+    secret_arn  = aws_secretsmanager_secret.main_proxy[0].arn
   }
 }
 
 resource "aws_db_proxy_default_target_group" "main" {
   count = var.enable_rds_proxy ? 1 :0
-  db_proxy_name = aws_db_proxy.main.name
+  db_proxy_name = aws_db_proxy.main[0].name
 
   connection_pool_config {
     connection_borrow_timeout    = var.connection_borrow_timeout
@@ -271,6 +271,6 @@ resource "aws_db_proxy_default_target_group" "main" {
 resource "aws_db_proxy_target" "example" {
   count = var.enable_rds_proxy ? 1 :0
   db_instance_identifier = aws_rds_cluster.main.cluster_identifier
-  db_proxy_name          = aws_db_proxy.main.name
-  target_group_name      = aws_db_proxy_default_target_group.main.name
+  db_proxy_name          = aws_db_proxy.main[0].name
+  target_group_name      = aws_db_proxy_default_target_group.main[0].name
 }
