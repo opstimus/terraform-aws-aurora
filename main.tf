@@ -167,12 +167,12 @@ resource "aws_secretsmanager_secret" "main_proxy" {
 
 resource "aws_secretsmanager_secret_version" "main_proxy" {
   count = var.enable_rds_proxy ? 1 :0
-  secret_id = aws_secretsmanager_secret.main_proxy.id
+  secret_id = aws_secretsmanager_secret.main_proxy[0].id
   secret_string = jsondecode({
     username            = aws_rds_cluster.main.master_username
     password            = aws_rds_cluster.main.master_password
     engine              = var.engine_family
-    host                = aws_rds_cluster.main.host
+    host                = aws_rds_cluster.main.endpoint
     port                = 3306
     dbClusterIdentifier = aws_rds_cluster.main.cluster_identifier
   })
