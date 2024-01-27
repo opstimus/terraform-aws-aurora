@@ -269,8 +269,8 @@ resource "aws_db_proxy_default_target_group" "main" {
 }
 
 resource "aws_db_proxy_target" "example" {
-  count                  = var.enable_rds_proxy ? 1 : 0
-  db_instance_identifier = aws_rds_cluster.main.cluster_identifier
-  db_proxy_name          = aws_db_proxy.main[0].name
-  target_group_name      = aws_db_proxy_default_target_group.main[0].name
+  count                 = var.enable_rds_proxy ? 1 : 0
+  db_cluster_identifier = aws_rds_cluster.main.cluster_identifier
+  db_proxy_name         = aws_db_proxy.main[0].name
+  target_group_name     = aws_db_proxy_default_target_group.main[0].name
 }
