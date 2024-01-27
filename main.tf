@@ -173,7 +173,7 @@ resource "aws_secretsmanager_secret_version" "main_proxy" {
     password            = aws_rds_cluster.main.master_password
     engine              = var.engine_family
     host                = aws_rds_cluster.main.endpoint
-    port                = 3306
+    port                = var.port
     dbClusterIdentifier = aws_rds_cluster.main.cluster_identifier
   })
 }
