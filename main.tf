@@ -162,7 +162,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
 
 resource "aws_secretsmanager_secret" "main_proxy" {
   count = var.enable_rds_proxy ? 1 : 0
-  name  = "${var.project}-${var.environment}-db-username-and-password"
+  name  = "${var.project}-${var.environment}-db-rds-proxy"
 }
 
 resource "aws_secretsmanager_secret_version" "main_proxy" {
@@ -184,7 +184,7 @@ data "aws_kms_key" "main" {
 
 resource "aws_iam_role" "main" {
   count = var.enable_rds_proxy ? 1 : 0
-  name  = "${var.project}-${var.environment}-proxy"
+  name  = "${var.project}-${var.environment}-db-rds-proxy"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -201,7 +201,7 @@ resource "aws_iam_role" "main" {
 
 resource "aws_iam_role_policy" "main" {
   count = var.enable_rds_proxy ? 1 : 0
-  name  = "${var.project}-${var.environment}-proxy"
+  name  = "${var.project}-${var.environment}-db-rds-proxy"
   role  = aws_iam_role.main[0].id
 
   policy = jsonencode({
@@ -238,7 +238,7 @@ resource "aws_iam_role_policy" "main" {
 
 resource "aws_db_proxy" "main" {
   count                  = var.enable_rds_proxy ? 1 : 0
-  name                   = "${var.project}-${var.environment}-proxy"
+  name                   = "${var.project}-${var.environment}-db"
   debug_logging          = var.debug_logging
   engine_family          = var.engine_family
   idle_client_timeout    = 1800
