@@ -160,14 +160,14 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
   }
 }
 
-resource "aws_secretsmanager_secret" "main_proxy" {
+resource "aws_secretsmanager_secret" "rds_proxy" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}-db-rds-proxy"
 }
 
-resource "aws_secretsmanager_secret_version" "main_proxy" {
+resource "aws_secretsmanager_secret_version" "rds_proxy" {
   count     = var.enable_rds_proxy ? 1 : 0
-  secret_id = aws_secretsmanager_secret.main_proxy[0].id
+  secret_id = aws_secretsmanager_secret.rds_proxy[0].id
   secret_string = jsonencode({
     username            = aws_rds_cluster.main.master_username
     password            = aws_rds_cluster.main.master_password
@@ -178,11 +178,11 @@ resource "aws_secretsmanager_secret_version" "main_proxy" {
   })
 }
 
-data "aws_kms_key" "main" {
+data "aws_kms_key" "rds_proxy" {
   key_id = "alias/aws/secretsmanager"
 }
 
-resource "aws_iam_role" "main" {
+resource "aws_iam_role" "rds_proxy" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}-db-rds-proxy"
   assume_role_policy = jsonencode({
@@ -199,10 +199,10 @@ resource "aws_iam_role" "main" {
   })
 }
 
-resource "aws_iam_role_policy" "main" {
+resource "aws_iam_role_policy" "rds_proxy" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}-db-rds-proxy"
-  role  = aws_iam_role.main[0].id
+  role  = aws_iam_role.rds_proxy[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -214,7 +214,7 @@ resource "aws_iam_role_policy" "main" {
         ],
         Effect = "Allow"
         Resource = [
-          aws_secretsmanager_secret.main_proxy[0].arn
+          aws_secretsmanager_secret.rds_proxy[0].arn
         ]
       },
       {
@@ -224,7 +224,7 @@ resource "aws_iam_role_policy" "main" {
         ],
         Effect = "Allow"
         Resource = [
-          data.aws_kms_key.main.arn
+          data.aws_kms_key.rds_proxy.arn
         ],
         Condition = {
           "StringEquals" = {
@@ -243,7 +243,7 @@ resource "aws_db_proxy" "main" {
   engine_family          = var.engine_family
   idle_client_timeout    = 1800
   require_tls            = var.require_tls
-  role_arn               = aws_iam_role.main[0].arn
+  role_arn               = aws_iam_role.rds_proxy[0].arn
   vpc_security_group_ids = [aws_security_group.db.id]
   vpc_subnet_ids         = var.private_subnet_ids
 
@@ -251,7 +251,7 @@ resource "aws_db_proxy" "main" {
     auth_scheme = "SECRETS"
     description = "Native Authentication"
     iam_auth    = "DISABLED"
-    secret_arn  = aws_secretsmanager_secret.main_proxy[0].arn
+    secret_arn  = aws_secretsmanager_secret.rds_proxy[0].arn
   }
 }
 
