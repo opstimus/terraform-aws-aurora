@@ -30,5 +30,5 @@ resource "aws_ssm_parameter" "rds_proxy_endpoint" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "/${var.project}/${var.environment}/central/aurora/rds_proxy_endpoint"
   type  = "String"
-  value = aws_db_proxy.main.endpoint
+  value = aws_db_proxy.main[0].endpoint
 }
