@@ -72,7 +72,7 @@ variable "backup_retention_period" {
 
 variable "storage_encrypted" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "kms_key_id" {

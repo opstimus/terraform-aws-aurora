@@ -107,17 +107,18 @@ resource "aws_rds_cluster" "main" {
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                        = var.instance_count
-  apply_immediately            = true
-  identifier                   = "${var.project}-${var.environment}-instance-${count.index}"
-  cluster_identifier           = aws_rds_cluster.main.id
-  engine                       = aws_rds_cluster.main.engine
-  engine_version               = aws_rds_cluster.main.engine_version
-  instance_class               = var.instancetype
-  db_subnet_group_name         = aws_db_subnet_group.main.name
-  db_parameter_group_name      = length(aws_rds_cluster_parameter_group.main) > 0 ? aws_rds_cluster_parameter_group.main[0].name : "default.${var.parameter_group_family}"
-  auto_minor_version_upgrade   = false
-  performance_insights_enabled = var.performance_insights_enabled
+  count                           = var.instance_count
+  apply_immediately               = true
+  identifier                      = "${var.project}-${var.environment}-instance-${count.index}"
+  cluster_identifier              = aws_rds_cluster.main.id
+  engine                          = aws_rds_cluster.main.engine
+  engine_version                  = aws_rds_cluster.main.engine_version
+  instance_class                  = var.instancetype
+  db_subnet_group_name            = aws_db_subnet_group.main.name
+  db_parameter_group_name         = length(aws_rds_cluster_parameter_group.main) > 0 ? aws_rds_cluster_parameter_group.main[0].name : "default.${var.parameter_group_family}"
+  auto_minor_version_upgrade      = false
+  performance_insights_enabled    = var.performance_insights_enabled
+  performance_insights_kms_key_id = var.performance_insights_enabled ? var.kms_key_id : null
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
