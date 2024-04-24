@@ -275,3 +275,11 @@ resource "aws_db_proxy_target" "main" {
   db_proxy_name         = aws_db_proxy.main[0].name
   target_group_name     = aws_db_proxy_default_target_group.main[0].name
 }
+
+resource "aws_db_proxy_endpoint" "main" {
+  count                  = var.enable_rds_proxy ? 1 : 0
+  db_proxy_name          = aws_db_proxy.main[0].name
+  db_proxy_endpoint_name = "${var.project}-${var.environment}-reader-db"
+  vpc_subnet_ids         = var.private_subnet_ids
+  target_role            = "READ_ONLY"
+}
