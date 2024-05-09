@@ -281,5 +281,6 @@ resource "aws_db_proxy_endpoint" "main" {
   db_proxy_name          = aws_db_proxy.main[0].name
   db_proxy_endpoint_name = "${var.project}-${var.environment}-readonly"
   vpc_subnet_ids         = var.private_subnet_ids
+  vpc_security_group_ids = [aws_security_group.db.id]
   target_role            = "READ_ONLY"
 }
