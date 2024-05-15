@@ -18,7 +18,7 @@ variable "instance_count" {
 }
 
 variable "read_replica_instance_count" {
-  type = number
+  type    = number
   default = 0
 }
 
@@ -103,7 +103,7 @@ variable "instancetype" {
 }
 
 variable "read_replica_instancetype" {
-  type = string
+  type        = string
   description = "Instance type (micro, medium or large)"
   default     = "db.t3.medium"
 }
