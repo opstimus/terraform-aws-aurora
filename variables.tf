@@ -17,6 +17,11 @@ variable "instance_count" {
   default = 1
 }
 
+variable "read_replica_instance_count" {
+  type = number
+  default = 0
+}
+
 variable "engine_mode" {
   type        = string
   description = "multimaster, parallelquery, provisioned, serverless"
@@ -93,6 +98,12 @@ variable "performance_insights_enabled" {
 
 variable "instancetype" {
   type        = string
+  description = "Instance type (micro, medium or large)"
+  default     = "db.t3.medium"
+}
+
+variable "read_replica_instancetype" {
+  type = string
   description = "Instance type (micro, medium or large)"
   default     = "db.t3.medium"
 }
