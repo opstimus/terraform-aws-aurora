@@ -75,22 +75,22 @@ This module sets up an Aurora RDS Cluster along with necessary resources like se
 
 ```hcl
 module "aurora_rds_cluster" {
-  source = "./modules/aurora_rds"
+  source = "https://github.com/opstimus/terraform-aws-aurora?ref=v<RELEASE>"
 
-  project                  = "my-project"
-  environment              = "production"
-  vpc_id                   = "vpc-123456"
-  private_subnet_ids        = ["subnet-123", "subnet-456"]
-  vpc_cidr                 = "10.0.0.0/16"
-  engine                   = "aurora-mysql"
-  engine_version           = "5.7.mysql_aurora.2.10.0"
-  db_name                  = "mydb"
-  master_username          = "admin"
-  parameter_group_family   = "aurora-mysql5.7"
-  performance_insights_enabled = true
-  storage_encrypted        = true
-  kms_key_id               = "arn:aws:kms:region:account-id:key/key-id"
-  backup_retention_period  = 7
+  project                       = "my-project"
+  environment                   = "production"
+  vpc_id                        = "vpc-123456"
+  private_subnet_ids            = ["subnet-123", "subnet-456"]
+  vpc_cidr                      = "10.0.0.0/16"
+  engine                        = "aurora-mysql"
+  engine_version                = "5.7.mysql_aurora.2.10.0"
+  db_name                       = "mydb"
+  master_username               = "admin"
+  parameter_group_family        = "aurora-mysql5.7"
+  performance_insights_enabled  = true
+  storage_encrypted             = true
+  kms_key_id                    = "arn:aws:kms:region:account-id:key/key-id"
+  backup_retention_period       = 7
 }
 ```
 
