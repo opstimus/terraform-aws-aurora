@@ -65,9 +65,9 @@ This module sets up an Aurora RDS Cluster along with necessary resources like se
 
 | Name              | Description                                   |
 |-------------------|-----------------------------------------------|
-| vpc_id            | The ID of the VPC                             |
-| vpc_cidr          | The CIDR block of the VPC                     |
 | db_password_secret| Name of the Secrets Manager secret for DB password |
+| aurora_endpoint   | The Aurora cluster's writer endpoint          |
+| aurora_reader_endpoint | The Aurora cluster's reader endpoint     |
 
 ## Usage examples
 
