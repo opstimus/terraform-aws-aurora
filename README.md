@@ -66,8 +66,7 @@ This module sets up an Aurora RDS Cluster along with necessary resources like se
 | Name              | Description                                   |
 |-------------------|-----------------------------------------------|
 | db_password_secret| Name of the Secrets Manager secret for DB password |
-| aurora_endpoint   | The Aurora cluster's writer endpoint          |
-| aurora_reader_endpoint | The Aurora cluster's reader endpoint     |
+
 
 ## Usage examples
 
