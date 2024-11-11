@@ -8,6 +8,16 @@ variable "environment" {
   description = "Environment name"
 }
 
+variable "name" {
+  type        = string
+  description = "Service name"
+  default     = ""
+}
+
+variable "deploy_region" {
+  type = string
+}
+
 variable "parameter_group_family" {
   type = string
 }
