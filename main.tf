@@ -1,7 +1,8 @@
 data "aws_region" "current" {}
 
 locals {
-  name = var.name != "" ? "-${var.name}" : ""
+  name     = var.name != "" ? "-${var.name}" : ""
+  ssm_name = var.name != "" ? "/${var.name}" : ""
 }
 
 resource "aws_security_group" "db" {
