@@ -14,10 +14,6 @@ variable "name" {
   default     = ""
 }
 
-variable "deploy_region" {
-  type = string
-}
-
 variable "parameter_group_family" {
   type = string
 }

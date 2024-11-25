@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 locals {
   name = var.name != "" ? "-${var.name}" : ""
 }
@@ -233,7 +235,7 @@ resource "aws_iam_role_policy" "rds_proxy" {
         ],
         Condition = {
           "StringEquals" = {
-            "kms:ViaService" = "secretsmanager.${var.deploy_region}.amazonaws.com"
+            "kms:ViaService" = "secretsmanager.${data.aws_region.current.name}.amazonaws.com"
           }
         }
       }
