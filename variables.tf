@@ -178,14 +178,6 @@ variable "max_idle_connections_percent" {
   default = 50
 }
 
-variable "to_port" {
-  type = number
-}
-
-variable "from_port" {
-  type = number
-}
-
 ###############
 # Autoscaling #
 ###############
