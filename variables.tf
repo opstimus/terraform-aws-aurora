@@ -204,14 +204,14 @@ variable "cpu_target_value" {
   default     = 60
 }
 
-variable "scale_in_cooldown" {
-  type        = number
-  description = "Cooldown period in seconds after a scale in activity"
-  default     = 300
-}
-
 variable "scale_out_cooldown" {
   type        = number
   description = "Cooldown period in seconds after a scale out activity"
   default     = 300
+}
+
+variable "scale_in_cooldown" {
+  type        = number
+  description = "Cooldown period in seconds after a scale in activity"
+  default     = 900
 }

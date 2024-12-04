@@ -316,7 +316,7 @@ resource "aws_appautoscaling_policy" "cpu" {
     }
 
     target_value       = var.cpu_target_value
-    scale_in_cooldown  = var.scale_in_cooldown
     scale_out_cooldown = var.scale_out_cooldown
+    scale_in_cooldown  = var.scale_in_cooldown
   }
 }
