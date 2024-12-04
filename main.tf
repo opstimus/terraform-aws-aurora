@@ -294,8 +294,8 @@ resource "aws_db_proxy_endpoint" "main" {
 resource "aws_appautoscaling_target" "main" {
   count = var.enable_autoscaling ? 1 : 0
 
+  min_capacity       = var.instance_count - 1
   max_capacity       = var.max_capacity
-  min_capacity       = var.min_capacity
   resource_id        = "cluster:${aws_rds_cluster.main.cluster_identifier}"
   scalable_dimension = "rds:cluster:ReadReplicaCount"
   service_namespace  = "rds"

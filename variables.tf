@@ -186,12 +186,6 @@ variable "enable_autoscaling" {
   default = false
 }
 
-variable "min_capacity" {
-  type        = number
-  description = "Auto Scaling minimum capacity"
-  default     = 0
-}
-
 variable "max_capacity" {
   type        = number
   description = "Auto Scaling maximum capacity"
