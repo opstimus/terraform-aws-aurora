@@ -10,7 +10,7 @@ variable "environment" {
 
 variable "name" {
   type        = string
-  description = "Service name"
+  description = "Cluster name"
   default     = ""
 }
 
