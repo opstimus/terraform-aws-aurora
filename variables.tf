@@ -201,7 +201,7 @@ variable "max_capacity" {
 variable "cpu_target_value" {
   type        = number
   description = "CPU target value for autoscaling"
-  default     = 60
+  default     = 80
 }
 
 variable "scale_out_cooldown" {
