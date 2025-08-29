@@ -184,6 +184,12 @@ variable "max_idle_connections_percent" {
   default = 50
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to assign to the resource."
+  default     = {}
+}
+
 ###############
 # Autoscaling #
 ###############
