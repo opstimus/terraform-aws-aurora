@@ -46,8 +46,7 @@ resource "aws_secretsmanager_secret_version" "main" {
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project}-${var.environment}${local.name}-aurora"
   subnet_ids = var.private_subnet_ids
-
-  tags = var.tags
+  tags       = var.tags
 }
 
 resource "aws_db_parameter_group" "main" {
@@ -72,6 +71,7 @@ resource "aws_rds_cluster_parameter_group" "main" {
   count  = length(var.parameter_group_parameters) != 0 ? 1 : 0
   name   = "${var.project}-${var.environment}-${var.engine}-cluster"
   family = var.parameter_group_family
+  tags   = var.tags
 
   dynamic "parameter" {
     for_each = var.parameter_group_parameters
@@ -83,7 +83,6 @@ resource "aws_rds_cluster_parameter_group" "main" {
   lifecycle {
     create_before_destroy = true
   }
-  tags = var.tags
 }
 
 resource "time_static" "main" {}
@@ -110,7 +109,7 @@ resource "aws_rds_cluster" "main" {
   kms_key_id                      = var.storage_encrypted == true ? var.kms_key_id : null
   network_type                    = var.network_type
   vpc_security_group_ids          = [aws_security_group.db.id]
-  tags = var.tags
+  tags                            = var.tags
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
@@ -126,7 +125,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   auto_minor_version_upgrade      = false
   performance_insights_enabled    = var.performance_insights_enabled
   performance_insights_kms_key_id = var.performance_insights_enabled ? var.kms_key_id : null
-  tags = var.tags
+  tags                            = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
@@ -144,10 +143,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   insufficient_data_actions = []
   alarm_actions             = [var.alarm_sns_arn]
   ok_actions                = [var.alarm_sns_arn]
+  tags                      = var.tags
   dimensions = {
     DBInstanceIdentifier = aws_rds_cluster.main.id
   }
-  tags = var.tags
+
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
@@ -165,16 +165,16 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
   insufficient_data_actions = []
   alarm_actions             = [var.alarm_sns_arn]
   ok_actions                = [var.alarm_sns_arn]
+  tags                      = var.tags
   dimensions = {
     DBInstanceIdentifier = aws_rds_cluster.main.id
   }
-  tags = var.tags
 }
 
 resource "aws_secretsmanager_secret" "rds_proxy" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}${local.name}-db-rds-proxy"
-  tags = var.tags
+  tags  = var.tags
 }
 
 resource "aws_secretsmanager_secret_version" "rds_proxy" {
@@ -200,6 +200,7 @@ data "aws_kms_key" "rds_proxy" {
 resource "aws_iam_role" "rds_proxy" {
   count = var.enable_rds_proxy ? 1 : 0
   name  = "${var.project}-${var.environment}${local.name}-db-rds-proxy"
+  tags  = var.tags
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -212,7 +213,6 @@ resource "aws_iam_role" "rds_proxy" {
       }
     ]
   })
-  tags = var.tags
 }
 
 resource "aws_iam_role_policy" "rds_proxy" {
@@ -262,6 +262,7 @@ resource "aws_db_proxy" "main" {
   role_arn               = aws_iam_role.rds_proxy[0].arn
   vpc_security_group_ids = [aws_security_group.db.id]
   vpc_subnet_ids         = var.private_subnet_ids
+  tags                   = var.tags
 
   auth {
     auth_scheme = "SECRETS"
@@ -269,7 +270,7 @@ resource "aws_db_proxy" "main" {
     iam_auth    = "DISABLED"
     secret_arn  = aws_secretsmanager_secret.rds_proxy[0].arn
   }
-  tags = var.tags
+
 }
 
 resource "aws_db_proxy_default_target_group" "main" {
@@ -299,7 +300,7 @@ resource "aws_db_proxy_endpoint" "main" {
   vpc_subnet_ids         = var.private_subnet_ids
   vpc_security_group_ids = [aws_security_group.db.id]
   target_role            = "READ_ONLY"
-  tags = var.tags
+  tags                   = var.tags
 }
 
 ###############
@@ -313,7 +314,7 @@ resource "aws_appautoscaling_target" "main" {
   resource_id        = "cluster:${aws_rds_cluster.main.cluster_identifier}"
   scalable_dimension = "rds:cluster:ReadReplicaCount"
   service_namespace  = "rds"
-  tags = var.tags
+  tags               = var.tags
 }
 
 resource "aws_appautoscaling_policy" "cpu" {
