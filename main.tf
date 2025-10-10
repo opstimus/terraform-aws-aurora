@@ -25,7 +25,12 @@ resource "aws_security_group" "db" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = var.tags
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}-db"
+    },
+    var.tags
+  )
 }
 
 resource "random_password" "main" {
@@ -46,7 +51,12 @@ resource "aws_secretsmanager_secret_version" "main" {
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project}-${var.environment}${local.name}-aurora"
   subnet_ids = var.private_subnet_ids
-  tags       = var.tags
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}-db"
+    },
+    var.tags
+  )
 }
 
 resource "aws_db_parameter_group" "main" {
