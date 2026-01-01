@@ -112,7 +112,7 @@ resource "aws_rds_cluster" "main" {
   network_type                    = var.network_type
   vpc_security_group_ids          = [aws_security_group.db.id]
 
-  dynamic "serverless_v2_scaling_configuration" {
+  dynamic "serverlessv2_scaling_configuration" {
     for_each = var.enable_serverless_v2 ? [1] : []
     content {
       min_capacity = var.serverless_v2_min_capacity
