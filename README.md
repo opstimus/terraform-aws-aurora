@@ -9,7 +9,7 @@ This module sets up an Aurora RDS Cluster along with necessary resources like se
 | Name       | Version   |
 |------------|-----------|
 | terraform  | >= 1.3.0  |
-| aws        | >= 4.0    |
+| aws        | >= 6.0    |
 | random     | >= 3.4.0  |
 | time       | >= 0.9    |
 | external   | >= 2.2.0  |
@@ -18,7 +18,7 @@ This module sets up an Aurora RDS Cluster along with necessary resources like se
 
 | Name  | Version   |
 |-------|-----------|
-| aws   | >= 4.0    |
+| aws   | >= 6.0    |
 | random| >= 3.4.0  |
 | time  | >= 0.9    |
 
