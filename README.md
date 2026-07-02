@@ -1,3 +1,12 @@
+> ⚠️ **Moved to the monorepo.**
+> This module now lives in [`opstimus/terraform-modules`](https://github.com/opstimus/terraform-modules) at `modules/aws-aurora`.
+>
+> ```hcl
+> source = "git::https://github.com/opstimus/terraform-modules.git//modules/aws-aurora?ref=aws-aurora/v2.1.0"
+> ```
+>
+> This repository remains for existing consumers; new development happens in the monorepo.
+
 # Aurora RDS Cluster Module
 
 ## Description
